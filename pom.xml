@@ -16,6 +16,9 @@
 	<properties>
 		<java.version>17</java.version>
 		<maven.compiler.target>17</maven.compiler.target>
+		<amazon.aws.sdk.version>1.12.117</amazon.aws.sdk.version>
+		<commons.io.version>2.11.0</commons.io.version>
+		<bouncycastle.version>1.69</bouncycastle.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -38,6 +41,26 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>${amazon.aws.sdk.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpg-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
 		</dependency>
 	</dependencies>
 
