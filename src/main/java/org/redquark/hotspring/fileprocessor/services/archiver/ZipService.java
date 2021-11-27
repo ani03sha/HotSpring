@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -23,11 +25,10 @@ public class ZipService {
     // List to store all the files in the directory to be zipped
     private final List<String> allFilesToBeZipped = new ArrayList<>();
 
-    public void zip(File directory, String zipFileName) {
-        log.info("Zipping files in the directory={} to zip={}", directory.getName(), zipFileName);
-        try (
-                FileOutputStream fileOutputStream = new FileOutputStream(zipFileName);
-                ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream)) {
+    public byte[] zip(String destinationDirectory, File directory) {
+        log.info("Zipping files in the directory={}", destinationDirectory);
+        ByteArrayOutputStream zipByteStream = new ByteArrayOutputStream();
+        try (ZipOutputStream zipOutputStream = new ZipOutputStream(zipByteStream)) {
             populateAllFilesInDirectory(directory);
             for (String filePath : allFilesToBeZipped) {
                 log.info("Adding file={} to the zip", filePath);
@@ -45,15 +46,16 @@ public class ZipService {
         } catch (IOException e) {
             log.info("Exception occurred while zipping the files: {}", e.getMessage(), e);
         }
+        return zipByteStream.toByteArray();
     }
 
-    public void unzip(String zipFilePath, String destinationPath) {
+    public void unzip(InputStream zippedIs, String destinationPath) {
         File destinationDirectory = new File(destinationPath);
         if (!destinationDirectory.exists()) {
             boolean isCreated = destinationDirectory.mkdir();
             log.info("Destination directory is created: {}", isCreated ? destinationDirectory.getName() : "");
         }
-        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipFilePath))) {
+        try (ZipInputStream zipInputStream = new ZipInputStream(zippedIs)) {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
                 String filePath = destinationPath + File.separator + zipEntry.getName();

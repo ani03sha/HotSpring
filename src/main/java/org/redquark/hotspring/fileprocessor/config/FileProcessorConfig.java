@@ -8,13 +8,13 @@ import org.springframework.context.annotation.Configuration;
 public class FileProcessorConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "s3")
+    @ConfigurationProperties(prefix = "file-processor-config.s3")
     public AWSConfig getAWSConfig() {
         return new AWSConfig();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "crypto")
+    @ConfigurationProperties(prefix = "file-processor-config.crypto")
     public CryptoConfig getCryptoConfig() {
         return new CryptoConfig();
     }

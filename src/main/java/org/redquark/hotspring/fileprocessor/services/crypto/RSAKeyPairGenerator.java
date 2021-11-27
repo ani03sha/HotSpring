@@ -74,7 +74,7 @@ public class RSAKeyPairGenerator implements CustomKeyPairGenerator {
                     isArmored
             );
         } catch (NoSuchAlgorithmException | NoSuchProviderException | FileNotFoundException e) {
-            e.printStackTrace();
+           log.error("Exception occurred while generating key pair: {}", e.getMessage(), e);
         }
     }
 

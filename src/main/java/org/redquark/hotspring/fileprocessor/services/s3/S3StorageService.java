@@ -7,6 +7,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +26,10 @@ public class S3StorageService {
     private final AmazonS3 amazonS3;
 
     public S3StorageService(FileProcessorConfig fileProcessorConfig) {
-        AWSCredentials awsCredentials =
-                new BasicAWSCredentials(fileProcessorConfig.getAWSConfig().getAccessKey(), fileProcessorConfig.getAWSConfig().getSecretKey());
+        AWSCredentials awsCredentials = new BasicAWSCredentials(
+                fileProcessorConfig.getAWSConfig().getAccessKey(),
+                fileProcessorConfig.getAWSConfig().getSecretKey()
+        );
         this.amazonS3 = AmazonS3ClientBuilder
                 .standard()
                 .withRegion(fileProcessorConfig.getAWSConfig().getRegion())
@@ -34,20 +37,21 @@ public class S3StorageService {
                 .build();
     }
 
-    public void upload(String bucket,
-                       String key,
-                       Map<String, String> optionalMetadata,
-                       InputStream fileInputStream) {
+    public PutObjectResult upload(String bucket,
+                                  String key,
+                                  Map<String, String> optionalMetadata,
+                                  InputStream fileInputStream) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         if (optionalMetadata != null && !optionalMetadata.isEmpty()) {
             optionalMetadata.forEach(objectMetadata::addUserMetadata);
         }
         try {
             log.info("Storing {} in bucket={}", key, bucket);
-            amazonS3.putObject(bucket, key, fileInputStream, objectMetadata);
+            return amazonS3.putObject(bucket, key, fileInputStream, objectMetadata);
         } catch (AmazonServiceException e) {
             log.error("Exception occurred while store the file in the S3 bucket: {}", e.getMessage(), e);
         }
+        return null;
     }
 
     public byte[] retrieve(String bucket, String key) {

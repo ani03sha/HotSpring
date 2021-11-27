@@ -32,8 +32,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,32 +45,48 @@ import java.util.Objects;
 public class PGPEncryptorDecryptor implements EncryptorDecryptor {
 
     @Override
-    public void encrypt(String publicKeyPath, String cipheredFileLocation, String inputFileName, boolean isArmored) {
-        log.info("Encrypting file={} using PGP", inputFileName);
-        try (
-                InputStream publicKey = new FileInputStream(publicKeyPath);
-                OutputStream cipheredFile = new FileOutputStream(cipheredFileLocation)
-        ) {
-            encryptFile(inputFileName, readPublicKey(publicKey), cipheredFile, isArmored);
-        } catch (IOException e) {
+    public byte[] encrypt(
+            File inputFile,
+            InputStream publicKeyStream,
+            OutputStream cipheredFileStream,
+            boolean isArmored
+    ) {
+        ByteArrayOutputStream cipheredBytes = new ByteArrayOutputStream();
+        try {
+            PGPPublicKey pgpPublicKey = readPublicKey(publicKeyStream);
+            Security.addProvider(new BouncyCastleProvider());
+            if (isArmored) {
+                cipheredFileStream = new ArmoredOutputStream(cipheredFileStream);
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                PGPCompressedDataGenerator compressor = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
+                PGPUtil.writeFileToLiteralData(compressor.open(byteArrayOutputStream), PGPLiteralData.BINARY, inputFile);
+                compressor.close();
+                JcePGPDataEncryptorBuilder encryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5)
+                        .setWithIntegrityPacket(true)
+                        .setSecureRandom(new SecureRandom())
+                        .setProvider("BC");
+                PGPEncryptedDataGenerator generator = new PGPEncryptedDataGenerator(encryptorBuilder);
+                JcePublicKeyKeyEncryptionMethodGenerator encryptionMethodGenerator = new JcePublicKeyKeyEncryptionMethodGenerator(Objects.requireNonNull(pgpPublicKey))
+                        .setProvider(new BouncyCastleProvider())
+                        .setSecureRandom(new SecureRandom());
+                generator.addMethod(encryptionMethodGenerator);
+                byte[] bytes = byteArrayOutputStream.toByteArray();
+                OutputStream outputStream = generator.open(cipheredFileStream, bytes.length);
+                outputStream.write(bytes);
+                cipheredBytes.writeTo(cipheredFileStream);
+                outputStream.close();
+                cipheredFileStream.close();
+            }
+        } catch (IOException | PGPException e) {
             log.error("Exception occurred while encrypting the file: {}", e.getMessage(), e);
         }
+        return cipheredBytes.toByteArray();
     }
 
     @Override
-    public void decrypt(String cipheredFileLocation, String privateKeyPath, String decryptedFileLocation, String password) {
-        try (
-                InputStream cipheredFileStream = new FileInputStream(cipheredFileLocation);
-                InputStream privateKeyStream = new FileInputStream(privateKeyPath);
-                OutputStream decryptedFileStream = new FileOutputStream(decryptedFileLocation)) {
-            decryptFile(cipheredFileStream, decryptedFileStream, privateKeyStream, password.toCharArray());
-        } catch (IOException e) {
-            log.error("Exception occurred while decrypting file: {}", e.getMessage(), e);
-        }
-    }
-
-    private void decryptFile(InputStream cipheredFileStream, OutputStream decryptedFileStream, InputStream privateKeyStream, char[] passphrase) {
+    public byte[] decrypt(InputStream cipheredFileStream, OutputStream decryptedFileStream, InputStream privateKeyStream, char[] passphrase) {
         Security.addProvider(new BouncyCastleProvider());
+        ByteArrayOutputStream decryptedBytes = new ByteArrayOutputStream();
         try {
             cipheredFileStream = PGPUtil.getDecoderStream(cipheredFileStream);
             PGPObjectFactory pgpObjectFactory = new PGPObjectFactory(cipheredFileStream, new JcaKeyFingerprintCalculator());
@@ -106,10 +120,7 @@ public class PGPEncryptorDecryptor implements EncryptorDecryptor {
             }
             if (message instanceof PGPLiteralData literalData) {
                 InputStream unclear = literalData.getInputStream();
-                int c;
-                while ((c = unclear.read()) >= 0) {
-                    decryptedFileStream.write(c);
-                }
+                unclear.transferTo(decryptedBytes);
             } else if (message instanceof PGPOnePassSignatureList) {
                 throw new PGPException("Encryption message doesn't contain literal data but signed data");
             } else {
@@ -117,11 +128,12 @@ public class PGPEncryptorDecryptor implements EncryptorDecryptor {
             }
             if (pgpPublicKeyEncryptedData.isIntegrityProtected() && !pgpPublicKeyEncryptedData.verify()) {
                 throw new PGPException("Integrity check of message is failed");
-
             }
+            decryptedBytes.writeTo(decryptedFileStream);
         } catch (IOException | PGPException e) {
-            e.printStackTrace();
+            log.error("Exception occurred while decrypting file: {}", e.getMessage(), e);
         }
+        return decryptedBytes.toByteArray();
     }
 
     private PGPPrivateKey findSecretKey(InputStream privateKeyStream, long keyID, char[] passphrase) {
@@ -137,35 +149,6 @@ public class PGPEncryptorDecryptor implements EncryptorDecryptor {
             log.error("Exception occurred while finding the secret key: {}", e.getMessage(), e);
         }
         return null;
-    }
-
-    private void encryptFile(String inputFileName, PGPPublicKey pgpPublicKey, OutputStream cipheredFileStream, boolean isArmored) {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            if (isArmored) {
-                cipheredFileStream = new ArmoredOutputStream(cipheredFileStream);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                PGPCompressedDataGenerator compressor = new PGPCompressedDataGenerator(PGPCompressedData.ZIP);
-                PGPUtil.writeFileToLiteralData(compressor.open(byteArrayOutputStream), PGPLiteralData.BINARY, new File(inputFileName));
-                compressor.close();
-                JcePGPDataEncryptorBuilder encryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5)
-                        .setWithIntegrityPacket(true)
-                        .setSecureRandom(new SecureRandom())
-                        .setProvider("BC");
-                PGPEncryptedDataGenerator generator = new PGPEncryptedDataGenerator(encryptorBuilder);
-                JcePublicKeyKeyEncryptionMethodGenerator encryptionMethodGenerator = new JcePublicKeyKeyEncryptionMethodGenerator(pgpPublicKey)
-                        .setProvider(new BouncyCastleProvider())
-                        .setSecureRandom(new SecureRandom());
-                generator.addMethod(encryptionMethodGenerator);
-                byte[] bytes = byteArrayOutputStream.toByteArray();
-                OutputStream outputStream = generator.open(cipheredFileStream, bytes.length);
-                outputStream.write(bytes);
-                outputStream.close();
-                cipheredFileStream.close();
-            }
-        } catch (IOException | PGPException e) {
-            log.error("Exception occurred while encrypting the file: {}", e.getMessage(), e);
-        }
     }
 
     private PGPPublicKey readPublicKey(InputStream publicKeyStream) {
