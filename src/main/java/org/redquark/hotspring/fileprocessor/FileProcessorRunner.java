@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -126,7 +127,11 @@ public class FileProcessorRunner implements CommandLineRunner {
         }
         log.info("Decryption ends");
         log.info("Unzipping starts");
-        unzipFile(new ByteArrayInputStream(Objects.requireNonNull(decryptedBytes)), unzippedFileLocation);
+        List<byte[]> unzippedBytes = unzipFile(new ByteArrayInputStream(Objects.requireNonNull(decryptedBytes)), unzippedFileLocation);
+        for (byte[] unzipped : unzippedBytes) {
+            OutputStream os = new FileOutputStream(unzippedFileLocation + File.separator + UUID.randomUUID());
+            os.write(unzipped);
+        }
         log.info("Unzipping ends");
     }
 
@@ -134,8 +139,8 @@ public class FileProcessorRunner implements CommandLineRunner {
         return zipService.zip(destinationDirectory, inputFile);
     }
 
-    private void unzipFile(InputStream zippedIs, String destinationPath) {
-        zipService.unzip(zippedIs, destinationPath);
+    private List<byte[]> unzipFile(InputStream zippedIs, String destinationPath) {
+        return zipService.unzip(zippedIs, destinationPath);
     }
 
     private byte[] encryptFile(File file, String publicKeyPath, String cipheredFileLocation, boolean isArmored) {
