@@ -127,7 +127,7 @@ public class FileProcessorRunner implements CommandLineRunner {
         }
         log.info("Decryption ends");
         log.info("Unzipping starts");
-        List<byte[]> unzippedBytes = unzipFile(new ByteArrayInputStream(Objects.requireNonNull(decryptedBytes)), unzippedFileLocation);
+        List<byte[]> unzippedBytes = unzipFile(new ByteArrayInputStream(Objects.requireNonNull(decryptedBytes)));
         for (byte[] unzipped : unzippedBytes) {
             OutputStream os = new FileOutputStream(unzippedFileLocation + File.separator + UUID.randomUUID());
             os.write(unzipped);
@@ -139,8 +139,8 @@ public class FileProcessorRunner implements CommandLineRunner {
         return zipService.zip(destinationDirectory, inputFile);
     }
 
-    private List<byte[]> unzipFile(InputStream zippedIs, String destinationPath) {
-        return zipService.unzip(zippedIs, destinationPath);
+    private List<byte[]> unzipFile(InputStream zippedIs) {
+        return zipService.unzip(zippedIs);
     }
 
     private byte[] encryptFile(File file, String publicKeyPath, String cipheredFileLocation, boolean isArmored) {

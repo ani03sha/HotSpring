@@ -49,22 +49,12 @@ public class ZipService {
         return zipByteStream.toByteArray();
     }
 
-    public List<byte[]> unzip(InputStream zippedIs, String destinationPath) {
-        File destinationDirectory = new File(destinationPath);
-        if (!destinationDirectory.exists()) {
-            boolean isCreated = destinationDirectory.mkdir();
-            log.info("Destination directory is created: {}", isCreated ? destinationDirectory.getName() : "");
-        }
+    public List<byte[]> unzip(InputStream zippedIs) {
         try (ZipInputStream zipInputStream = new ZipInputStream(zippedIs)) {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
-                String filePath = destinationPath + File.separator + zipEntry.getName();
                 if (!zipEntry.isDirectory()) {
                     extractFile(zipInputStream);
-                } else {
-                    File directory = new File(filePath);
-                    boolean isDirectoryCreated = directory.mkdirs();
-                    log.info("A new directory is created: {}", isDirectoryCreated ? directory.getName() : "");
                 }
                 zipInputStream.closeEntry();
                 zipEntry = zipInputStream.getNextEntry();
