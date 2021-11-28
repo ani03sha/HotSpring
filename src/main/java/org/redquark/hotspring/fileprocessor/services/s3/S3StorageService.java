@@ -1,18 +1,14 @@
 package org.redquark.hotspring.fileprocessor.services.s3;
 
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.redquark.hotspring.fileprocessor.config.FileProcessorConfig;
+import org.redquark.hotspring.fileprocessor.services.s3.connection.AmazonS3ConnectionFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,16 +21,8 @@ public class S3StorageService {
 
     private final AmazonS3 amazonS3;
 
-    public S3StorageService(FileProcessorConfig fileProcessorConfig) {
-        AWSCredentials awsCredentials = new BasicAWSCredentials(
-                fileProcessorConfig.getAWSConfig().getAccessKey(),
-                fileProcessorConfig.getAWSConfig().getSecretKey()
-        );
-        this.amazonS3 = AmazonS3ClientBuilder
-                .standard()
-                .withRegion(fileProcessorConfig.getAWSConfig().getRegion())
-                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
-                .build();
+    public S3StorageService(AmazonS3ConnectionFactory amazonS3ConnectionFactory) {
+        this.amazonS3 = amazonS3ConnectionFactory.getConnection();
     }
 
     public PutObjectResult upload(String bucket,
