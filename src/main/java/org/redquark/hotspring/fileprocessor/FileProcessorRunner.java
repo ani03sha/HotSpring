@@ -11,6 +11,7 @@ import org.redquark.hotspring.fileprocessor.services.crypto.CustomKeyPairGenerat
 import org.redquark.hotspring.fileprocessor.services.crypto.EncryptorDecryptor;
 import org.redquark.hotspring.fileprocessor.services.s3.S3StorageService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -31,6 +32,7 @@ import static org.redquark.hotspring.fileprocessor.config.CryptoConfig.KeyPairCo
 
 @Component
 @Slf4j
+@ConditionalOnProperty(value = "app.mode", havingValue = "cmd")
 public class FileProcessorRunner implements CommandLineRunner {
 
     private static final String ARCHIVED_FILE = ".archived.zip";

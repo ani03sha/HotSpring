@@ -1,14 +1,22 @@
+app:
+  mode: web
+
 spring:
   application:
     name: Hot Spring
+  servlet:
+    multipart:
+      max-file-size: 5000KB
+      max-request-size: 500KB
+
 
 file-processor-config:
   s3:
-    accessKey: <access-key>
-      secretKey: <secret-key>
-      region: <region>
-      bucket: <bucket-name>
-      s3Retrieved: src/main/resources/file/s3Retrieved
+    accessKey: AKIASHHKVYVIJEOQR3YH
+    secretKey: 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
+    region: ap-south-1
+    bucket: hotspring-file-processor
+    s3Retrieved: src/main/resources/file/s3Retrieved
 
   crypto:
     keypair-config:
