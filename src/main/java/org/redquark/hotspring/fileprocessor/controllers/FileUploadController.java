@@ -3,6 +3,7 @@ package org.redquark.hotspring.fileprocessor.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.redquark.hotspring.fileprocessor.domains.FileInfo;
 import org.redquark.hotspring.fileprocessor.domains.response.FileUploadResponse;
+import org.redquark.hotspring.fileprocessor.services.process.ProcessFiles;
 import org.redquark.hotspring.fileprocessor.services.storage.FileStorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -28,9 +29,11 @@ import java.util.stream.Collectors;
 public class FileUploadController {
 
     private final FileStorageService fileStorageService;
+    private final ProcessFiles processFiles;
 
-    public FileUploadController(FileStorageService fileStorageService) {
+    public FileUploadController(FileStorageService fileStorageService, ProcessFiles processFiles) {
         this.fileStorageService = fileStorageService;
+        this.processFiles = processFiles;
     }
 
     @PostMapping("/upload")
@@ -40,6 +43,9 @@ public class FileUploadController {
             Arrays.stream(files).forEach(fileStorageService::upload);
             message = "Uploaded all files successfully!";
             log.info(message);
+            log.info("File processing starts...");
+            processFiles.process();
+            log.info("File processing ends...");
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new FileUploadResponse(message));
@@ -72,5 +78,18 @@ public class FileUploadController {
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                 .body(file);
+    }
+
+    @GetMapping("/clear")
+    public ResponseEntity<FileUploadResponse> clearAllFiles() {
+        String message;
+        try {
+            processFiles.clearAllFiles();
+            message = "Cleared all files";
+            return ResponseEntity.status(HttpStatus.OK).body(new FileUploadResponse(message));
+        } catch (Exception e) {
+            message = "Could not clear files";
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new FileUploadResponse(message));
+        }
     }
 }
