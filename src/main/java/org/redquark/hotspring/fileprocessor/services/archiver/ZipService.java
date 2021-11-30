@@ -1,6 +1,7 @@
 package org.redquark.hotspring.fileprocessor.services.archiver;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redquark.hotspring.fileprocessor.domains.UnzippedFile;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -22,8 +23,6 @@ public class ZipService {
     private static final int BUFFER_SIZE = 1 << 12;
     // List to store all the files in the directory to be zipped
     private final List<String> allFilesToBeZipped = new ArrayList<>();
-    // List to store the input streams representing the unzipped files
-    private final List<byte[]> unzippedFiles = new ArrayList<>();
 
     public byte[] zip(String destinationDirectory, File directory) {
         log.info("Zipping files in the directory={}", destinationDirectory);
@@ -49,13 +48,16 @@ public class ZipService {
         return zipByteStream.toByteArray();
     }
 
-    public List<byte[]> unzip(InputStream zippedIs) {
+    public List<UnzippedFile> unzip(InputStream zippedIs) {
+        List<UnzippedFile> unzippedFiles = new ArrayList<>();
         try (ZipInputStream zipInputStream = new ZipInputStream(zippedIs)) {
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
+                byte[] bytes = new byte[0];
                 if (!zipEntry.isDirectory()) {
-                    extractFile(zipInputStream);
+                    bytes = extractFile(zipInputStream);
                 }
+                unzippedFiles.add(new UnzippedFile(zipEntry.getName(), bytes));
                 zipInputStream.closeEntry();
                 zipEntry = zipInputStream.getNextEntry();
             }
@@ -65,17 +67,18 @@ public class ZipService {
         return unzippedFiles;
     }
 
-    private void extractFile(ZipInputStream zipInputStream) {
+    private byte[] extractFile(ZipInputStream zipInputStream) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             byte[] bytes = new byte[BUFFER_SIZE];
             int read;
             while ((read = zipInputStream.read(bytes)) != -1) {
                 outputStream.write(bytes, 0, read);
             }
-            unzippedFiles.add(outputStream.toByteArray());
+            return outputStream.toByteArray();
         } catch (IOException e) {
             log.error("Exception occurred while extracting zip file: {}", e.getMessage(), e);
         }
+        return null;
     }
 
     private void populateAllFilesInDirectory(File directory) {

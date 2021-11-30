@@ -6,6 +6,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.redquark.hotspring.fileprocessor.config.AWSConfig;
 import org.redquark.hotspring.fileprocessor.config.CryptoConfig;
+import org.redquark.hotspring.fileprocessor.domains.UnzippedFile;
 import org.redquark.hotspring.fileprocessor.services.archiver.ZipService;
 import org.redquark.hotspring.fileprocessor.services.crypto.CustomKeyPairGenerator;
 import org.redquark.hotspring.fileprocessor.services.crypto.EncryptorDecryptor;
@@ -129,10 +130,10 @@ public class FileProcessorRunner implements CommandLineRunner {
         }
         log.info("Decryption ends");
         log.info("Unzipping starts");
-        List<byte[]> unzippedBytes = unzipFile(new ByteArrayInputStream(Objects.requireNonNull(decryptedBytes)));
-        for (byte[] unzipped : unzippedBytes) {
-            OutputStream os = new FileOutputStream(unzippedFileLocation + File.separator + UUID.randomUUID());
-            os.write(unzipped);
+        List<UnzippedFile> unzippedFiles = unzipFile(new ByteArrayInputStream(Objects.requireNonNull(decryptedBytes)));
+        for (UnzippedFile unzippedFile : unzippedFiles) {
+            OutputStream os = new FileOutputStream(unzippedFileLocation + File.separator + unzippedFile.getName());
+            os.write(unzippedFile.getBytes());
         }
         log.info("Unzipping ends");
     }
@@ -141,7 +142,7 @@ public class FileProcessorRunner implements CommandLineRunner {
         return zipService.zip(destinationDirectory, inputFile);
     }
 
-    private List<byte[]> unzipFile(InputStream zippedIs) {
+    private List<UnzippedFile> unzipFile(InputStream zippedIs) {
         return zipService.unzip(zippedIs);
     }
 
