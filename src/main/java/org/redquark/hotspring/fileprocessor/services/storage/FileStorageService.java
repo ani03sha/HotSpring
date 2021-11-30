@@ -1,6 +1,7 @@
 package org.redquark.hotspring.fileprocessor.services.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.redquark.hotspring.fileprocessor.config.CryptoConfig;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,11 @@ import java.util.stream.Stream;
 @Slf4j
 public class FileStorageService implements StorageService {
 
-    private final Path root = Paths.get("uploads");
+    private final Path root;
+
+    public FileStorageService(CryptoConfig cryptoConfig) {
+        root = Paths.get(cryptoConfig.getFileConfig().getInputFileLocation());
+    }
 
     @Override
     public void init() {

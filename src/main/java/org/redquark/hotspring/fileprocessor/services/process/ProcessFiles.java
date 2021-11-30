@@ -142,12 +142,20 @@ public class ProcessFiles {
 
     public void clearAllFiles() {
         try {
-            List<String> paths = Arrays.asList(cipheredFileLocation, decipheredFileLocation, zippedFileLocation, unzippedFileLocation, s3RetrievedFileLocation);
+            List<String> paths = Arrays.asList(
+                    inputFileLocation,
+                    cipheredFileLocation,
+                    decipheredFileLocation,
+                    zippedFileLocation,
+                    unzippedFileLocation,
+                    s3RetrievedFileLocation
+            );
             for (String path : paths) {
                 FileUtils.cleanDirectory(Paths.get(path).toFile());
             }
         } catch (IOException e) {
             log.error("Could not delete files in directory: {}", e.getMessage(), e);
+            throw new RuntimeException("File not found!!!");
         }
     }
 

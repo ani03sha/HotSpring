@@ -12,11 +12,11 @@ spring:
 
 file-processor-config:
   s3:
-    accessKey: AKIASHHKVYVIJEOQR3YH
-    secretKey: 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
-    region: ap-south-1
-    bucket: hotspring-file-processor
-    s3Retrieved: src/main/resources/file/s3Retrieved
+    accessKey: <access-key>
+      secretKey: <secret-key>
+      region: <region>
+      bucket: <bucket-name>
+      s3Retrieved: src/main/resources/file/s3Retrieved
 
   crypto:
     keypair-config:

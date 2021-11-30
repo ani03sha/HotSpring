@@ -11,6 +11,7 @@ public class FileUploadInitializer implements CommandLineRunner {
 
     public FileUploadInitializer(FileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
+
     }
 
     @Override
