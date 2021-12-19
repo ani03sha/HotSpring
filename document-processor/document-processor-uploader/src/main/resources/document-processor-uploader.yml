@@ -1,0 +1,17 @@
+s3-config:
+  endpoint-url: https://redquark-hotspring.s3.ap-south-1.amazonaws.com/document-processor-uploader/
+  access-key: XXXXXXX
+  secret-key: XXXXXXXXXXXXX
+  bucket-name: redquark-hotspring
+  region: ap-south-1
+  upload-folder: document-processor-uploader
+
+crypto:
+  keypair-config:
+    key-path: src/main/resources/crypto/keys
+    username: test
+    password: test
+    isArmored: True
+    keySize: 1024
+    algorithm: RSA
+    provider: BC

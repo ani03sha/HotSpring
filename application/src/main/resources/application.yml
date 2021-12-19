@@ -1,6 +1,8 @@
 spring:
   application:
     name: Application
+  config:
+    import: 'classpath:document-processor-uploader.yml'
 
 server:
   port: 9000
@@ -8,5 +10,6 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-  api-docs:
-    path: /api-docs
+    syntax-highlight:
+      activated: true
+    enabled: true
