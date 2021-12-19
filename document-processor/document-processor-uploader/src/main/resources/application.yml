@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: Document Processor Uploader
+
+server:
+  port: 9001
