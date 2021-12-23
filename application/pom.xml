@@ -49,6 +49,16 @@
 			<artifactId>document-processor-uploader</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.redquark.hotspring</groupId>
+			<artifactId>document-processor-lambda</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.redquark.hotspring</groupId>
+			<artifactId>document-processor</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
