@@ -1,10 +1,10 @@
 package org.redquark.hotspring.document.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.redquark.hotspring.document.configs.DownloaderConfig;
 import org.redquark.hotspring.document.configs.LambdaConfig;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
