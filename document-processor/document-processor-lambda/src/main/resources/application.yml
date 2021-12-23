@@ -1,0 +1,2 @@
+document-processor-downloader:
+  download-endpoint: http://localhost:9002/api/v1/document/download
