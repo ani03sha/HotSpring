@@ -1,11 +1,11 @@
 package org.redquark.hotspring.uploader.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.redquark.hotspring.uploader.domains.Document;
 import org.redquark.hotspring.uploader.exceptions.DocumentException;
 import org.redquark.hotspring.uploader.process.DocumentZipper;
-import org.redquark.hotspring.uploader.process.PGPEncryptor;
 import org.redquark.hotspring.uploader.process.S3Helper;
 import org.redquark.hotspring.uploader.services.DocumentService;
 import org.springframework.stereotype.Service;
@@ -22,22 +22,12 @@ import java.util.Objects;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DocumentServiceImpl implements DocumentService {
 
     private static final String ZIP_FILE_NAME = "archived.zip";
     private final DocumentZipper zipper;
-    private final PGPEncryptor encryptor;
     private final S3Helper s3Helper;
-
-    public DocumentServiceImpl(
-            DocumentZipper zipper,
-            PGPEncryptor encryptor,
-            S3Helper s3Helper
-    ) {
-        this.zipper = zipper;
-        this.encryptor = encryptor;
-        this.s3Helper = s3Helper;
-    }
 
     @Override
     public void upload(MultipartFile[] documents) {
@@ -55,8 +45,7 @@ public class DocumentServiceImpl implements DocumentService {
             byte[] zippedBytes = zipper.zip(documentList);
             log.info("Zipping of files is completed.");
             Document zippedDocument = Document.builder().name(ZIP_FILE_NAME).contents(zippedBytes).build();
-            byte[] encryptedBytes = encryptor.encrypt(zippedDocument);
-            s3Helper.upload(ZIP_FILE_NAME + ".pgp", new HashMap<>(), new ByteArrayInputStream(encryptedBytes));
+            s3Helper.upload(ZIP_FILE_NAME, new HashMap<>(), new ByteArrayInputStream(zippedDocument.getContents()));
             for (File document : documentsToUpload) {
                 Files.delete(document.toPath());
             }

@@ -41,7 +41,7 @@ import java.util.Objects;
 @Slf4j
 public class PGPEncryptor {
 
-    private static final String PUBLIC_KEY = "public.dat";
+    private static final String PUBLIC_KEY = "public.asc";
 
     private final RSAKeyPairGenerator keyPairGenerator;
     private final CryptoConfig cryptoConfig;
@@ -94,7 +94,7 @@ public class PGPEncryptor {
                 JcePGPDataEncryptorBuilder encryptorBuilder = new JcePGPDataEncryptorBuilder(PGPEncryptedData.CAST5)
                         .setWithIntegrityPacket(true)
                         .setSecureRandom(new SecureRandom())
-                        .setProvider("BC");
+                        .setProvider(cryptoConfig.getProvider());
                 PGPEncryptedDataGenerator generator = new PGPEncryptedDataGenerator(encryptorBuilder);
                 JcePublicKeyKeyEncryptionMethodGenerator encryptionMethodGenerator = new JcePublicKeyKeyEncryptionMethodGenerator(Objects.requireNonNull(pgpPublicKey))
                         .setProvider(new BouncyCastleProvider())
@@ -106,10 +106,11 @@ public class PGPEncryptor {
                 outputStream.close();
                 cipheredFileStream.close();
             }
+            return bytes;
         } catch (IOException | PGPException e) {
             log.error("Exception occurred while encrypting the file: {}", e.getMessage(), e);
+            throw new DocumentEncryptionException("Could not encrypt file", e);
         }
-        return bytes;
     }
 
     private PGPPublicKey readPublicKey(InputStream publicKeyStream) {
@@ -137,4 +138,3 @@ public class PGPEncryptor {
         return pgpPublicKey;
     }
 }
-

@@ -38,8 +38,8 @@ import java.util.Date;
 @Slf4j
 public class RSAKeyPairGenerator {
 
-    private static final String PRIVATE_KEY = "private.dat";
-    private static final String PUBLIC_KEY = "public.dat";
+    private static final String PRIVATE_KEY = "private.asc";
+    private static final String PUBLIC_KEY = "public.asc";
     private final CryptoConfig cryptoConfig;
 
     public RSAKeyPairGenerator(DocumentUploaderConfig documentUploaderConfig) {
