@@ -9,13 +9,13 @@ import org.springframework.context.annotation.Configuration;
 public class DocumentUploaderConfig {
 
     @Bean
-    @ConfigurationProperties(prefix = "s3-config")
+    @ConfigurationProperties(prefix = "s3-uploader-config")
     public S3Config getS3Config() {
         return new S3Config();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "crypto.keypair-config")
+    @ConfigurationProperties(prefix = "crypto-uploader-config")
     public CryptoConfig getCryptoConfig() {
         return new CryptoConfig();
     }
