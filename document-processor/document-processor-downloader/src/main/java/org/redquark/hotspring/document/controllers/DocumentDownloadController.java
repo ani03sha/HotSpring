@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redquark.hotspring.document.domains.S3FileSpecification;
 import org.redquark.hotspring.document.domains.response.DocumentDownloadResponse;
 import org.redquark.hotspring.document.services.DocumentDownloadService;
+import org.redquark.hotspring.document.services.ProcessDocumentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ import java.io.InputStream;
 public class DocumentDownloadController {
 
     private final DocumentDownloadService documentDownloadService;
+    private final ProcessDocumentService processDocumentService;
 
     @PostMapping("/download")
     @Operation(
@@ -61,12 +63,13 @@ public class DocumentDownloadController {
         try {
             log.info("Received request for downloading file={} from the S3 bucket={}", key, bucket);
             InputStream downloadedStream = documentDownloadService.downloadSingleFile(bucket, key);
+            processDocumentService.processDocument(key, downloadedStream);
             log.info("Downloaded file={} from bucket={} successfully.", key, bucket);
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(new DocumentDownloadResponse(key, "Document downloaded successfully"));
         } catch (Exception e) {
-            log.error("Could not download file due to: {}", e.getMessage(), e);
+            log.error("Could not process file due to: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new DocumentDownloadResponse(key, "Could not download document due to: " + e.getMessage()));

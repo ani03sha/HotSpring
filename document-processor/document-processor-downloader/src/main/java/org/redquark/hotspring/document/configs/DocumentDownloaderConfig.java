@@ -12,4 +12,10 @@ public class DocumentDownloaderConfig {
     public S3DownloaderConfig getS3DownloaderConfig() {
         return new S3DownloaderConfig();
     }
+
+    @Bean
+    @ConfigurationProperties(prefix = "crypto-downloader-config")
+    public CryptoDownloaderConfig getCryptoDownloaderConfig() {
+        return new CryptoDownloaderConfig();
+    }
 }
