@@ -11,6 +11,7 @@
     <modules>
         <module>document-processor-uploader</module>
         <module>document-processor-lambda</module>
+        <module>document-processor-downloader</module>
     </modules>
 
     <properties>

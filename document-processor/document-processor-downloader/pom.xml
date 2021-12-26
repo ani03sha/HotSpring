@@ -5,29 +5,29 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.1</version>
-		<relativePath/>
+		<version>2.6.2</version>
+		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.redquark.hotspring</groupId>
-	<artifactId>application</artifactId>
+	<artifactId>document-processor-downloader</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>application</name>
-	<description>Application project for the whole hot spring</description>
+	<name>document-processor-downloader</name>
+	<description>Spring Boot app to download files from the S3 bucket</description>
 	<properties>
 		<java.version>17</java.version>
 		<openapi.version>1.6.1</openapi.version>
+		<aws.sdk.version>1.12.130</aws.sdk.version>
+		<commons.io.version>2.10.0</commons.io.version>
+		<bouncycastle.version>1.69</bouncycastle.version>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -45,24 +45,30 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.redquark.hotspring</groupId>
-			<artifactId>document-processor-uploader</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>${aws.sdk.version}</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.redquark.hotspring</groupId>
-			<artifactId>document-processor-lambda</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons.io.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.redquark.hotspring</groupId>
-			<artifactId>document-processor-downloader</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.redquark.hotspring</groupId>
-			<artifactId>document-processor</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpg-jdk15on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
