@@ -1,11 +1,12 @@
 s3-downloader-config:
   endpoint-url: https://redquark-hotspring.s3.ap-south-1.amazonaws.com/document-processor-uploader/
-  access-key: XXXXXXXX
-  secret-key: XXXXXXXXXXXXXXXXXXXXXXXX
+  access-key: XXXXXXXXXX
+  secret-key: XXXXXXXXXXXXXXXXXXXX
   bucket-name: redquark-hotspring
   region: ap-south-1
   source-folder: document-processor-uploader
   destination-folder: document-processor/downloads
+  upload-folder: document-processor-downloader
 
 crypto-downloader-config:
   key-path: document-processor/crypto/keys
@@ -15,3 +16,8 @@ crypto-downloader-config:
   keySize: 1024
   algorithm: RSA
   provider: BC
+
+kafka-downloader-config:
+  topic: document-publish
+  batch-size: 2
+  retry-count: 5

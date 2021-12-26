@@ -18,4 +18,10 @@ public class DocumentDownloaderConfig {
     public CryptoDownloaderConfig getCryptoDownloaderConfig() {
         return new CryptoDownloaderConfig();
     }
+
+    @Bean
+    @ConfigurationProperties(prefix = "kafka-downloader-config")
+    public KafkaDownloaderConfig getKafkaDownloaderConfig() {
+        return new KafkaDownloaderConfig();
+    }
 }

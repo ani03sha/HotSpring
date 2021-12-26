@@ -12,4 +12,5 @@ public class S3DownloaderConfig {
     private String region;
     private String sourceFolder;
     private String destinationFolder;
+    private String uploadFolder;
 }

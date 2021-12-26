@@ -67,12 +67,12 @@ public class DocumentDownloadController {
             log.info("Downloaded file={} from bucket={} successfully.", key, bucket);
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new DocumentDownloadResponse(key, "Document downloaded successfully"));
+                    .body(new DocumentDownloadResponse(key, "Documents processed successfully"));
         } catch (Exception e) {
             log.error("Could not process file due to: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new DocumentDownloadResponse(key, "Could not download document due to: " + e.getMessage()));
+                    .body(new DocumentDownloadResponse(key, "Could not process document due to: " + e.getMessage()));
         }
     }
 
