@@ -25,8 +25,6 @@ import java.util.Map;
 @Slf4j
 public class S3Helper {
 
-    private static final String ZIP_FOLDER = "/zip";
-
     private final AmazonS3 amazonS3;
     private final TransferManager transferManager;
 
@@ -54,9 +52,8 @@ public class S3Helper {
             optionalMetadata.forEach(objectMetadata::addUserMetadata);
         }
         try {
-            String zipFolderName = key.contains(".zip") ? folderName + ZIP_FOLDER : folderName;
             log.info("Storing {} in bucket={}", key, bucketName);
-            PutObjectResult result = amazonS3.putObject(bucketName, zipFolderName + File.separator + key, fileInputStream, objectMetadata);
+            PutObjectResult result = amazonS3.putObject(bucketName, folderName + "/" + key, fileInputStream, objectMetadata);
             log.info("Object is stored with versionId={}", result.getMetadata().getVersionId());
         } catch (AmazonServiceException e) {
             log.error("Exception occurred while store the file in the S3 bucket: {}", e.getMessage(), e);
@@ -65,8 +62,7 @@ public class S3Helper {
     }
 
     public void uploadMultipleFiles(List<File> documentsToUpload) {
-        String zipFolderName = documentsToUpload.get(0).getName().contains(".zip") ? folderName + ZIP_FOLDER : folderName;
-        MultipleFileUpload multipleFileUpload = transferManager.uploadFileList(bucketName, zipFolderName, new File("."), documentsToUpload);
+        MultipleFileUpload multipleFileUpload = transferManager.uploadFileList(bucketName, folderName, new File("."), documentsToUpload);
         try {
             multipleFileUpload.waitForCompletion();
         } catch (InterruptedException e) {

@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,9 @@ public class DocumentServiceImpl implements DocumentService {
             Document zippedDocument = Document.builder().name(ZIP_FILE_NAME).contents(zippedBytes).build();
             byte[] encryptedBytes = encryptor.encrypt(zippedDocument);
             s3Helper.upload(ZIP_FILE_NAME + ".pgp", new HashMap<>(), new ByteArrayInputStream(encryptedBytes));
+            for (File document : documentsToUpload) {
+                Files.delete(document.toPath());
+            }
         } catch (IOException e) {
             throw new DocumentException("Could not extract contents of file", e);
         }
