@@ -58,6 +58,11 @@
 			<artifactId>document-processor</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.redquark.hotspring</groupId>
+			<artifactId>pdf-operations</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>
