@@ -11,6 +11,7 @@
     <modules>
         <module>application</module>
         <module>document-processor</module>
+        <module>pdf-operations</module>
     </modules>
 
     <properties>
