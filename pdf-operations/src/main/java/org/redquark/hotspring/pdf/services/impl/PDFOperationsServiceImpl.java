@@ -35,9 +35,8 @@ public class PDFOperationsServiceImpl implements PDFOperationsService {
     @Override
     public InputStream merge(List<InputStream> pdfList) {
         log.info("Merging of {} pdf files starts...", pdfList.size());
-        try {
+        try (ByteArrayOutputStream mergedPdf = new ByteArrayOutputStream()) {
             pdfMergerUtility.addSources(pdfList);
-            ByteArrayOutputStream mergedPdf = new ByteArrayOutputStream();
             pdfMergerUtility.setDestinationStream(mergedPdf);
             pdfMergerUtility.mergeDocuments(null);
             byte[] mergedPdfBytes = mergedPdf.toByteArray();

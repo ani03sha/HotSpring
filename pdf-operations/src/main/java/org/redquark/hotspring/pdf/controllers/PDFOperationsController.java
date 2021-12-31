@@ -38,7 +38,11 @@ public class PDFOperationsController {
 
     private final PDFOperationsService pdfOperationsService;
 
-    @PostMapping("/merge")
+    @PostMapping(
+            value = "/merge",
+            consumes = MULTIPART_FORM_DATA_VALUE,
+            produces = APPLICATION_PDF_VALUE
+    )
     @Operation(
             summary = "Merge a list of documents",
             tags = {"PDF Operations Controller"},
@@ -61,7 +65,9 @@ public class PDFOperationsController {
                 pdfList.add(pdf.getInputStream());
             }
             InputStream mergedPDFs = pdfOperationsService.merge(pdfList);
-            return new ResponseEntity<>(new InputStreamResource(mergedPDFs), null, OK);
+            return ResponseEntity
+                    .status(OK)
+                    .body(new InputStreamResource(mergedPDFs));
         } catch (IOException e) {
             log.error("Request for merging PDFs is failed due to: {}", e.getMessage());
             return ResponseEntity
@@ -98,8 +104,10 @@ public class PDFOperationsController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             StampStyle stampStyle = mapper.readValue(stampStyleString, StampStyle.class);
-            InputStream mergedPDFs = pdfOperationsService.stamp(pdf.getInputStream(), stampStyle);
-            return new ResponseEntity<>(new InputStreamResource(mergedPDFs), null, OK);
+            InputStream stampedPDF = pdfOperationsService.stamp(pdf.getInputStream(), stampStyle);
+            return ResponseEntity
+                    .status(OK)
+                    .body(new InputStreamResource(stampedPDF));
         } catch (IOException e) {
             log.error("Request for merging PDFs is failed due to: {}", e.getMessage());
             return ResponseEntity
