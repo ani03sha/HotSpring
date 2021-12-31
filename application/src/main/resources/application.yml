@@ -2,7 +2,7 @@ spring:
   application:
     name: Application
   config:
-    import: 'classpath:document-processor-uploader.yml, classpath:document-processor-downloader.yml'
+    import: 'classpath:document-processor-uploader.yml, classpath:document-processor-downloader.yml, classpath:pdf-operations.yml'
 
 server:
   port: 9000
