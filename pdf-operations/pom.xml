@@ -59,6 +59,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<mainClass>org.redquark.hotspring.application.Application</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
